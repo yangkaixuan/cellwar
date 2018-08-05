@@ -291,8 +291,9 @@ export default class Main {
     }
   }
   killenemy(enemy) {
-    enemy.playAnimation();
     this.music.playExplosion();
+    enemy.playAnimation();
+   
     this.player.zhendong()
     databus.score += databus.continuous_number;
       
@@ -360,8 +361,8 @@ export default class Main {
         ani.aniRender(ctx)
       }
     })
-
     this.gameinfo.renderGameScore(ctx, databus.score)
+    this.gameinfo.renderactionhint(ctx)
 
   }
 

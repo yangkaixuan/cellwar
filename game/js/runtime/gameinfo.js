@@ -21,24 +21,24 @@ export default class GameInfo {
   fontw = 0
   s = 5
   renderGameScore(ctx, score) {
-    // ctx.drawImage(
-    //   paopao,
-    //   20,
-    //   screenHeight - 120,
-    //   50,
-    //   50
-    // )
-    // ctx.fillText(
-    //   databus.firepower,
-    //   35,
-    //   screenHeight - 88
-    // )
-    // ctx.font = "bold 50px Arial"
-    // ctx.fillText(
-    //   databus.score,
-    //   10,
-    //   50
-    // )
+    ctx.drawImage(
+      paopao,
+      20,
+      screenHeight - 120,
+      50,
+      50
+    )
+    ctx.fillText(
+      databus.firepower,
+      35,
+      screenHeight - 88
+    )
+    ctx.font = "bold 50px Arial"
+    ctx.fillText(
+      databus.score,
+      10,
+      50
+    )
 
 
 
@@ -59,47 +59,7 @@ export default class GameInfo {
     ctx.fillStyle = "#fff"
     ctx.font = "bold " + this.fonts + "px Arial";
    
-    if (databus.getscore) {  
-        
-      ctx.globalAlpha = 0.2
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, screenHeight / 2 - 110, screenHeight, 130);
-      ctx.save();
-      ctx.beginPath();
-      ctx.globalAlpha = 1
-      ctx.fillStyle = "#fff";
-      if (databus.continuous_number < 10) {
-
-        ctx.fillText(
-          "+" + databus.continuous_number,
-          screenWidth / 2 - 38 - this.fontw,
-          screenHeight / 2 - 50 + this.fontw
-        )
-      } else if (databus.continuous_number < 100 && databus.continuous_number >= 10) {
-
-        ctx.fillText(
-          "+" + databus.continuous_number,
-          screenWidth / 2 - 23 - this.fontw,
-          screenHeight / 2 - 50 + this.fontw
-        )
-      } else if (databus.continuous_number < 1000 && databus.continuous_number >= 100) {
-        ctx.fillText(
-          "+" + databus.continuous_number,
-          screenWidth / 2 - 45 - this.fontw,
-          screenHeight / 2 - 50 + this.fontw
-        )
-      }
-      ctx.font = "bold " + this.fonts / 2 + "px Arial"
-      
-      ctx.fillText(
-        "+" + databus.getscore + "点成长",
-        screenWidth / 2 - 82 - this.fontw * 2,
-        screenHeight/2 -20 + this.fontw * 2
-      )
-
-
-
-    }
+   
     
 
 
@@ -198,27 +158,47 @@ export default class GameInfo {
 
   }
 
-
-  renderactionhint(ctx, hint) {
+ 
+  renderactionhint(ctx) {
     if (databus.getscore) {
-      ctx.fillStyle = "#f8e516"
-      ctx.font = "bold 20px Arial"
-      ctx.fillText(
-        "+" + databus.getscore,
-        screenWidth - 10,
-        150
-      )
-      if (databus.continuous_number > 1) {
+      ctx.globalAlpha = 0.2
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, screenHeight / 2 - 110, screenHeight, 130);
+      ctx.save();
+      ctx.beginPath();
+      ctx.globalAlpha = 1
+      ctx.fillStyle = "#fff";
+      if (databus.continuous_number < 10) {
         ctx.fillText(
-          hint,
-          10,
-          180
+          "+" + databus.continuous_number,
+          screenWidth / 2 - 38 - this.fontw,
+          screenHeight / 2 - 50 + this.fontw
+        )
+      } else if (databus.continuous_number < 100 && databus.continuous_number >= 10) {
+
+        ctx.fillText(
+          "+" + databus.continuous_number,
+          screenWidth / 2 - 23 - this.fontw,
+          screenHeight / 2 - 50 + this.fontw
+        )
+      } else if (databus.continuous_number < 1000 && databus.continuous_number >= 100) {
+        ctx.fillText(
+          "+" + databus.continuous_number,
+          screenWidth / 2 - 45 - this.fontw,
+          screenHeight / 2 - 50 + this.fontw
         )
       }
-
+      ctx.font = "bold " + this.fonts / 2 + "px Arial"
+      ctx.fillText(
+        "+" + databus.getscore + "点成长",
+        screenWidth / 2 - 82 - this.fontw * 2,
+        screenHeight / 2 - 20 + this.fontw * 2
+      )
     }
   }
 
+
+  //引导内容提示
   guidance(ctx) {
     if(databus.enemys[0].healthpoint >= databus.growup){
       ctx.globalAlpha = 0.2
