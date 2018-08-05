@@ -10,12 +10,7 @@ import GameInfo from './runtime/gameinfo'
 import Music from './runtime/music'
 import DataBus from './databus'
 import HomePage from './runtime/homepage'
-
-
-
-
-
-
+import GameOverPage from './runtime/gameoverpage'
 
 let hero = new Image()
 hero.src = 'images/hero.png'
@@ -40,13 +35,12 @@ export default class Main {
   constructor() {
 
     //实例化分数系统对象
-    this.gameinfo = new GameInfo()
+    this.gameinfo = new GameInfo();
     //实例化分数音效对象
-    this.music = new Music()
+    this.music = new Music();
     //实例化home页面对象
-    this.home = new HomePage()
-
-
+    this.home = new HomePage();
+    this.gameoverpage = new GameOverPage();;
     //解决在真机上画图渲染的锯齿问题 具体逻辑查看微信
     if(window.devicePixelRatio){      
       var width = canvas.width;
@@ -302,8 +296,8 @@ export default class Main {
     let x = e.touches[0].clientX
     let y = e.touches[0].clientY
 
-    let area = this.gameinfo.btnArea
-
+    let area = this.gameoverpage.btnArea
+    console.log(area)
     if (x >= area.startX &&
       x <= area.endX &&
       y >= area.startY &&
@@ -344,16 +338,6 @@ export default class Main {
 
     this.gameinfo.renderGameScore(ctx, databus.score)
 
-    // 游戏结束停止帧循环
-    if (databus.gameOver) {
-      this.gameinfo.renderGameOver(ctx, databus.score)
-
-      if (!this.hasEventBind) {
-        this.hasEventBind = true
-        this.touchHandler = this.touchEventHandler.bind(this)
-        canvas.addEventListener('touchstart', this.touchHandler)
-      }
-    }
   }
 
   // 游戏逻辑更新主函数
@@ -381,23 +365,28 @@ export default class Main {
   }
 
 
-  mainrender() {    
-    this.bg.render(ctx)
-    this.home.showpage(ctx)
-
-
-  }
+ 
 
   // 实现游戏帧循环
   loop() {
     databus.frame++   
     if (databus.page == "home") {
-      this.mainrender()
+      this.bg.render(ctx)
+      this.home.showpage(ctx)
     }else{
       this.update();
       this.render();
       if (databus.enemyscamp == "guidance" && !databus.gameOver) {
         this.gameinfo.guidance(ctx);
+      }
+      // 游戏结束停止帧循环
+      if (databus.gameOver) {
+        this.gameoverpage.renderGameOver(ctx, databus.score)
+        if (!this.hasEventBind) {
+          this.hasEventBind = true
+          this.touchHandler = this.touchEventHandler.bind(this)
+          canvas.addEventListener('touchstart', this.touchHandler)
+        }
       }
       
     }
