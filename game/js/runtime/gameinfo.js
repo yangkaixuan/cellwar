@@ -6,21 +6,29 @@ let databus = new DataBus()
 let energy = new Image()
 
 let paopao = new Image()
-
+let pause = new Image()
 energy.src = 'images/energy.png';
 
 paopao.src = 'images/bullet.png'
-
+pause.src = 'images/pause.png'
 
 export default class GameInfo {
 
   energy_Width = screenWidth - 80
-
-
   fonts = 60
   fontw = 0
   s = 5
+
+
   renderGameScore(ctx, score) {
+    ctx.drawImage(
+      pause,
+      10,
+      10,
+      40,
+      40
+    )
+
     ctx.drawImage(
       paopao,
       20,
@@ -36,10 +44,9 @@ export default class GameInfo {
     ctx.font = "bold 50px Arial"
     ctx.fillText(
       databus.score,
-      10,
-      50
+      60,
+      48
     )
-
 
 
     if (this.fonts == databus.fons) {
@@ -56,21 +63,9 @@ export default class GameInfo {
     } else if (this.fontw > databus.fonsw) {
       this.fontw -= this.s / 2
     }
-    ctx.fillStyle = "#fff"
-    ctx.font = "bold " + this.fonts + "px Arial";
+
    
-   
-    
-
-
-
-
-
-
-
-
-
-
+  
 
     var energyCells;
     if (databus.stuts < 1000) {
@@ -158,9 +153,11 @@ export default class GameInfo {
 
   }
 
- 
+  //显示在游戏过程中的得分和成长值的及时反馈
   renderactionhint(ctx) {
     if (databus.getscore) {
+      ctx.fillStyle = "#fff"
+      ctx.font = "bold " + this.fonts + "px Arial";
       ctx.globalAlpha = 0.2
       ctx.fillStyle = "#000";
       ctx.fillRect(0, screenHeight / 2 - 110, screenHeight, 130);

@@ -36,7 +36,8 @@ export default class DataBus {
     this.animations = []
     this.continuous_number  = 1
     this.enemyscamp = "guidance"
-    this.gameOver = false
+    this.gameOver = false;
+    this.gamepause = false;
     this.gameOvertip = ""
     this.startenemyscampswitch();
 

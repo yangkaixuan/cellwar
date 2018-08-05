@@ -96,15 +96,10 @@ export default class Enemy extends Animation {
     
     // 对象回收
     if ( this.y > window.innerHeight + this.height ){
-
-      //databus.removeEnemey(this)
-
-
+      databus.removeEnemey(this)
       if (databus.enemyscamp == "guidance") {
         databus.first = true;
       }
-
-
     }
       
     

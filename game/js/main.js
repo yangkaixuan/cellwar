@@ -11,7 +11,7 @@ import Music from './runtime/music'
 import DataBus from './databus'
 import HomePage from './runtime/homepage'
 import GameOverPage from './runtime/gameoverpage'
-
+import GamePausePage from './runtime/pausepage'
 let hero = new Image()
 hero.src = 'images/hero.png'
 
@@ -40,9 +40,11 @@ export default class Main {
     this.music = new Music();
     //实例化home页面对象
     this.home = new HomePage();
-    this.gameoverpage = new GameOverPage();;
+    this.gameoverpage = new GameOverPage();
+    this.pausepage = new GamePausePage();
+    
     //解决在真机上画图渲染的锯齿问题 具体逻辑查看微信
-    if(window.devicePixelRatio){      
+    if (window.devicePixelRatio) {
       var width = canvas.width;
       var height = canvas.height;
       canvas.style.width = width + "px"
@@ -52,25 +54,77 @@ export default class Main {
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-
     // 维护当前requestAnimationFrame的id
     this.aniId = 0
     this.restart()
     canvas.addEventListener('touchstart', ((e) => {
       e.preventDefault()
-      if (databus.page == "home"){
-        let x = e.touches[0].clientX
-        let y = e.touches[0].clientY      
-        if (x >= screenWidth / 2 - 90&&
-          x <= screenWidth / 2 + 90 &&
-          y >= screenHeight/2 + 40 &&
-          y <= screenHeight/2 + 90){
-          this.music.playstart() 
-          databus.page = "game"
-          this.restart()          
-          }          
+      //判断当下属于哪个页面
+      let x, y;
+      switch (databus.page) {        
+        //当页面为home页面时候
+        case "home":
+          x = e.touches[0].clientX
+          y = e.touches[0].clientY
+          if (x >= screenWidth / 2 - 90 &&
+            x <= screenWidth / 2 + 90 &&
+            y >= screenHeight / 2 + 40 &&
+            y <= screenHeight / 2 + 90) {
+            this.music.playstart()
+            databus.page = "home_clicked"
+            this.restart();
+            }
+          break;
+        //当页面为游戏页面时候
+        case "game":
+          x = e.touches[0].clientX;
+          y = e.touches[0].clientY;
+          if (x >= 0 &&
+            x <= 60 &&
+            y >= 0 &&
+            y <= 60) {
+            databus.page = "pause";
+            databus.gamepause = true
+          }
+          break;
+        case "pause":
+          x = e.touches[0].clientX;
+          y = e.touches[0].clientY;
+          let Aarea = this.pausepage.AbtnArea
+          if (x >= Aarea.startX &&
+            x <= Aarea.endX &&
+            y >= Aarea.startY &&
+            y <= Aarea.endY){
+            databus.page = "home";
+            databus.gamepause = false;
+            }
+            
+          let Barea = this.pausepage.BbtnArea
+          if (x >= Barea.startX &&
+            x <= Barea.endX &&
+            y >= Barea.startY &&
+            y <= Barea.endY){
+            databus.page = "game";
+            databus.gamepause = false;
+            this.restart()
+            }
+          let Carea = this.pausepage.CbtnArea
+          if (x >= Carea.startX &&
+            x <= Carea.endX &&
+            y >= Carea.startY &&
+            y <= Carea.endY){
+            databus.page = "game";
+            databus.gamepause = false
+            }
+            
+          break;
+        default:
+          console.log();
       }
-     
+  
+       
+    
+      
 
 
       this.player.tem_ = e.touches[0].clientX - this.player.x - 40;
@@ -79,23 +133,28 @@ export default class Main {
 
     canvas.addEventListener('touchmove', ((e) => {
       e.preventDefault()
-      let x = e.touches[0].clientX - this.player.tem_
-      let y = e.touches[0].clientY - this.player.tem_y
-      this.player.ismove = true
-      this.player.setAirPosAcrossFingerPosZ(x, y)
+      if(!databus.gameOver && !databus.gamepause){
+        let x = e.touches[0].clientX - this.player.tem_
+        let y = e.touches[0].clientY - this.player.tem_y
+        this.player.ismove = true
+        this.player.setAirPosAcrossFingerPosZ(x, y)
+      }
+
 
     }))
 
     canvas.addEventListener('touchend', ((e) => {
       e.preventDefault()
-      if (!this.player.ismove) {
+      if (!this.player.ismove &&  "game" == databus.page) {
         this.player.shoot()
         this.player.music.playShoot()
-        
+      } 
+      if (databus.page == "home_clicked") {
+        databus.page = "game"
       }
       this.player.ismove = false
     }).bind(this))
-   
+
   }
 
   restart() {
@@ -113,7 +172,7 @@ export default class Main {
     this.bg = new BackGround(ctx)
     // 清除上一局的动画
     window.cancelAnimationFrame(this.aniId);
-    
+
     this.aniId = window.requestAnimationFrame(
       this.bindLoop,
       canvas
@@ -128,16 +187,17 @@ export default class Main {
   enemyGenerate() {
     switch (databus.enemyscamp) {
       case 'guidance':
-        if (databus.first){
+        if (databus.first) {
+          console.log(databus.first)
           let enemy = databus.pool.getItemByClass('minicell', minicell)
           enemy.init(1, Math.floor(Math.random() * 5 + 10))
           databus.enemys.push(enemy)
           databus.first = false
-        }       
+        }
         break;
       case 'start':
         //单细胞初级阵营
-        if (databus.frame %80 === 0) {
+        if (databus.frame % 80 === 0) {
           let enemy = databus.pool.getItemByClass('minicell', minicell)
           enemy.init(1.5, Math.floor(Math.random() * 10 + 20))
           databus.enemys.push(enemy)
@@ -147,7 +207,7 @@ export default class Main {
           enemyvirus.init(1, Math.floor(Math.random() * 100 + 100))
           databus.enemys.push(enemyvirus)
         }
-        
+
 
         // if (databus.frame % 150 === 1) {
         //   let enemy = databus.pool.getItemByClass('bule_di', bule_di)
@@ -262,26 +322,27 @@ export default class Main {
         } else {
 
           databus.stuts -= 0.03
-        
-        }       
+
+        }
       }
       tem_enemys.push(enemy);
     }
 
-    
+
     enemyisCollideWith();
-    function enemyisCollideWith(){
+
+    function enemyisCollideWith() {
       let enemy_tem = tem_enemys.shift()
-      if(0 == tem_enemys.length){
+      if (0 == tem_enemys.length) {
         return
       }
-      
-      for(let i = 0, il = tem_enemys.length; i < il; i++){
-        if(enemy_tem.isCollideWith(tem_enemys[i])){
-          if(enemy_tem.healthpoint > tem_enemys[i].healthpoint){
+
+      for (let i = 0, il = tem_enemys.length; i < il; i++) {
+        if (enemy_tem.isCollideWith(tem_enemys[i])) {
+          if (enemy_tem.healthpoint > tem_enemys[i].healthpoint) {
             enemy_tem.healthpoint += tem_enemys[i].healthpoint
-            tem_enemys[i].playAnimation();            
-          }else{
+            tem_enemys[i].playAnimation();
+          } else {
             tem_enemys[i].healthpoint += enemy_tem.healthpoint
             enemy_tem.playAnimation();
           }
@@ -293,23 +354,22 @@ export default class Main {
   killenemy(enemy) {
     this.music.playExplosion();
     enemy.playAnimation();
-   
+
     this.player.zhendong()
     databus.score += databus.continuous_number;
-      
+
 
     databus.getscoreanimation(Math.round(enemy.healthpoint / 2))
-    if (databus.stuts < 0.97){
+    if (databus.stuts < 0.97) {
       databus.stuts += 0.03
-    }
-    ;
-    databus.growup += enemy.healthpoint/2
+    };
+    databus.growup += enemy.healthpoint / 2
     if (databus.continuous_number % 2 == 0) {
       databus.bgsun()
     }
 
 
-    if (databus.enemyscamp == "guidance"){
+    if (databus.enemyscamp == "guidance") {
       databus.startenemyscampswitch();
       databus.enemyscamp = "start"
     }
@@ -350,7 +410,7 @@ export default class Main {
       })
 
     if (databus.stuts < 0) {
-      databus.gameOver = true  
+      databus.gameOver = true
       databus.gameOvertip = 2
     }
 
@@ -368,7 +428,7 @@ export default class Main {
 
   // 游戏逻辑更新主函数
   update() {
-    if (databus.gameOver)
+    if (databus.gameOver || databus.gamepause)
       return;
 
     this.bg.update()
@@ -381,7 +441,7 @@ export default class Main {
 
     this.enemyGenerate()
     databus.consume = parseInt(databus.growup / 100) * 0.2
-   
+
 
     this.collisionDetection()
 
@@ -389,32 +449,41 @@ export default class Main {
   }
 
 
- 
+
 
   // 实现游戏帧循环
   loop() {
-    databus.frame++   
-    if (databus.page == "home") {
-      this.bg.render(ctx)
-      this.home.showpage(ctx)
-    }else{
-      this.update();
-      this.render();
-      if (databus.enemyscamp == "guidance" && !databus.gameOver) {
-        this.gameinfo.guidance(ctx);
-      }
-      // 游戏结束停止帧循环
-      if (databus.gameOver) {
-        this.gameoverpage.renderGameOver(ctx, databus.score)
-        if (!this.hasEventBind) {
-          this.hasEventBind = true
-          this.touchHandler = this.touchEventHandler.bind(this)
-          canvas.addEventListener('touchstart', this.touchHandler)
-        }
-      }
-      
-    }
+    databus.frame++
 
+    switch (databus.page) {
+      case "home":
+        this.bg.render(ctx)
+        this.home.showpage(ctx)
+        break;
+      case "game":
+        this.update();
+        this.render();
+        if (databus.enemyscamp == "guidance" && !databus.gameOver && !databus.gamepause) {
+          this.gameinfo.guidance(ctx);
+        }
+        // 游戏结束停止帧循环
+        if (databus.gameOver) {
+          this.gameoverpage.renderGameOver(ctx, databus.score)
+          if (!this.hasEventBind) {
+            this.hasEventBind = true
+            this.touchHandler = this.touchEventHandler.bind(this)
+            canvas.addEventListener('touchstart', this.touchHandler)
+          }
+        }
+        break;
+      case "pause":
+        this.bg.render(ctx)
+        this.pausepage.renderGamepause(ctx)        
+        
+      default:
+
+    }
+      
 
     this.aniId = window.requestAnimationFrame(
       this.bindLoop,

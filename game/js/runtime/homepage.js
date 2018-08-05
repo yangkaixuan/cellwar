@@ -32,8 +32,6 @@ export default class HomePage {
       200,
       48
     )
-
-
     ctx.save();
     // //先画一长方形，背景色为白    
     ctx.fillStyle = "#fff";
