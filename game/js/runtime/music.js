@@ -23,6 +23,10 @@ export default class Music {
     this.attackedAudio = new Audio()
     this.attackedAudio.src = 'audio/attacked.mp3'
 
+    this.start = new Audio()
+    this.start.src = 'audio/start.mp3'
+
+
     this.playBgm()
   }
 
@@ -43,5 +47,10 @@ export default class Music {
   playattacked() {
     this.attackedAudio.currentTime = 0
     this.attackedAudio.play()
+  }
+
+  playstart() {
+    this.start.currentTime = 0
+    this.start.play()
   }
 }

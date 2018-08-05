@@ -79,9 +79,7 @@ export default class HomePage {
     ctx.beginPath();
     var width = canvas.width,
       height = canvas.height;
-    if (window.devicePixelRatio) {
 
-    }
 
     // //画一条线
     ctx.beginPath();

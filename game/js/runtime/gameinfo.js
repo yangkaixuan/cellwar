@@ -272,9 +272,8 @@ export default class GameInfo {
     
   }
 
-
+  //结束游戏页面画图
   renderGameOver(ctx, score) {
-
     ctx.fillStyle = "#000";
     ctx.globalAlpha = 0.7
     ctx.fillRect(0, 0, screenWidth, screenHeight);
@@ -385,18 +384,18 @@ export default class GameInfo {
     ctx.fillStyle = "#588ddc";
     ctx.fill();
     ctx.save();
-
  
-
+    ctx.fillStyle = "#000";
+    ctx.fillRect(screenWidth / 2 - 90, screenHeight / 2 + 40, 130, 50);
     /**
      * 重新开始按钮区域
      * 方便简易判断按钮点击
      */
     this.btnArea = {
-      startX: screenWidth / 2 - 65,
-      startY: screenWidth / 2 + 65,
-      endX: screenHeight - 280,
-      endY: screenHeight - 230
+      startX: screenWidth / 2 - 90,
+      endX: screenWidth / 2 + 90,
+      startY: screenHeight / 2 + 40,      
+      endY: screenHeight/2 + 90
     }
 
   }

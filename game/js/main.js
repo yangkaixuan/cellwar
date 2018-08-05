@@ -66,16 +66,15 @@ export default class Main {
       e.preventDefault()
       if (databus.page == "home"){
         let x = e.touches[0].clientX
-        let y = e.touches[0].clientY
-        screenWidth / 2 - 65, screenHeight - 280, 130, 50
-        if (x >= screenWidth / 2 - 65 &&
-          x <= screenWidth / 2 + 65 &&
-          y >= screenHeight - 280 &&
-          y <= screenHeight - 230){
+        let y = e.touches[0].clientY      
+        if (x >= screenWidth / 2 - 90&&
+          x <= screenWidth / 2 + 90 &&
+          y >= screenHeight/2 + 40 &&
+          y <= screenHeight/2 + 90){
+          this.music.playstart() 
           databus.page = "game"
-          this.restart()
-          }
-          
+          this.restart()          
+          }          
       }
      
 
