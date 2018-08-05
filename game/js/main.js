@@ -139,7 +139,7 @@ export default class Main {
         //单细胞初级阵营
         if (databus.frame %80 === 0) {
           let enemy = databus.pool.getItemByClass('minicell', minicell)
-          enemy.init(1, Math.floor(Math.random() * 10 + 20))
+          enemy.init(1.5, Math.floor(Math.random() * 10 + 20))
           databus.enemys.push(enemy)
         }
         if (databus.frame % 80 === 1) {
@@ -238,7 +238,6 @@ export default class Main {
     databus.bullets.forEach((bullet) => {
       for (let i = 0, il = databus.enemys.length; i < il; i++) {
         let enemy = databus.enemys[i]
-
         if (!enemy.isPlaying && enemy.isCollideWith(bullet)) {
           enemy.healthpoint -= databus.firepower;
           enemy.zhendong()
@@ -254,17 +253,41 @@ export default class Main {
       }
     })
 
+    let tem_enemys = [];
     for (let i = 0, il = databus.enemys.length; i < il; i++) {
       let enemy = databus.enemys[i]
       if (this.player.isCollideWith(enemy)) {
         if (databus.growup > enemy.healthpoint) {
           this.killenemy(enemy);
         } else {
-          databus.gameOver = true
-          databus.gameOvertip = 1
-        }
-        break
+
+          databus.stuts -= 0.03
+        
+        }       
       }
+      tem_enemys.push(enemy);
+    }
+
+    
+    enemyisCollideWith();
+    function enemyisCollideWith(){
+      let enemy_tem = tem_enemys.shift()
+      if(0 == tem_enemys.length){
+        return
+      }
+      
+      for(let i = 0, il = tem_enemys.length; i < il; i++){
+        if(enemy_tem.isCollideWith(tem_enemys[i])){
+          if(enemy_tem.healthpoint > tem_enemys[i].healthpoint){
+            enemy_tem.healthpoint += tem_enemys[i].healthpoint
+            tem_enemys[i].playAnimation();            
+          }else{
+            tem_enemys[i].healthpoint += enemy_tem.healthpoint
+            enemy_tem.playAnimation();
+          }
+        }
+      }
+      enemyisCollideWith();
     }
   }
   killenemy(enemy) {
@@ -275,7 +298,10 @@ export default class Main {
       
 
     databus.getscoreanimation(Math.round(enemy.healthpoint / 2))
-    databus.stuts = 1;
+    if (databus.stuts < 0.97){
+      databus.stuts += 0.03
+    }
+    ;
     databus.growup += enemy.healthpoint/2
     if (databus.continuous_number % 2 == 0) {
       databus.bgsun()
@@ -297,7 +323,6 @@ export default class Main {
     let y = e.touches[0].clientY
 
     let area = this.gameoverpage.btnArea
-    console.log(area)
     if (x >= area.startX &&
       x <= area.endX &&
       y >= area.startY &&
@@ -355,9 +380,7 @@ export default class Main {
 
     this.enemyGenerate()
     databus.consume = parseInt(databus.growup / 100) * 0.2
-    if (databus.enemyscamp != "guidance" && !databus.gameOver) {
-    databus.stuts -= 0.003
-    }
+   
 
     this.collisionDetection()
 
